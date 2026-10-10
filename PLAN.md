@@ -165,9 +165,18 @@ Note: set Vite `base: '/pdf-utilities/'` for GitHub Pages (project sites live un
 | 5 | **Page editor, PDF→Images, Metadata** | `v0.2.0` |
 | 6 | **Extras** | Compress, password, OCR, as needed |
 
+### Progress
+
+- [x] 1. Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, ESLint, Vitest, Playwright, CI, Pages deploy)
+- [x] 2. Images → PDF
+- [x] 3. Merge, Split, Rotate
+- [x] 4. PWA (installable, offline) and Docker image (built ahead of schedule)
+- [ ] 5. Page editor, PDF → Images, Metadata
+- [ ] 6. Extras
+
 ## 10. Open questions
 
-- **UI framework**: React (larger ecosystem) or Svelte (smaller bundle, less code)? Default: React.
-- **License**: MIT suggested for a public utility.
+- **UI framework**: React (larger ecosystem) or Svelte (smaller bundle, less code)? Decided: React.
+- **License**: MIT (decided).
 - **Name**: keep `pdf-utilities`, or choose a catchier name for the deployed site?
 - **Large files**: browsers handle files of a few hundred MB fine; a size warning is enough for now.
