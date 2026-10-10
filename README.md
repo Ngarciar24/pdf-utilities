@@ -63,7 +63,7 @@ Checked by automated tests: 25 unit tests, plus 6 browser tests that drive the r
 These are built but nobody has checked them yet. Treat them as unknown, not as working:
 
 - **Firefox and Safari.** The automated tests only run in Chromium (Chrome/Edge).
-- **Installing as an app and offline use.** The service worker and manifest are generated at build time, but installing and working offline have not been tried.
+- **The browser's "Install app" step** on a real Windows or Linux desktop, and all of the Windows installation steps. Tested so far, in Chromium: after one visit, the app loads and processes PDFs with no network and with the local server stopped.
 - **Docker image.** The `Dockerfile` has never been built, and no image has been published to `ghcr.io` (that only happens when a `v*` tag is pushed).
 - **Netlify / Vercel / Cloudflare Pages.** Should work as described below, but have not been tried.
 
@@ -71,24 +71,98 @@ These are built but nobody has checked them yet. Treat them as unknown, not as w
 
 PDF → images, page editor (reorder/delete pages with thumbnails), metadata editing, page numbers and watermarks, compression, password protect/unlock, OCR. See [PLAN.md](PLAN.md).
 
-## Install it on your laptop
+## Installation
 
-> Not tested yet, and only possible once the [live site is online](#live-site-not-online-yet).
+There are two ways to get PDF Utilities on your laptop. Both end with the same result: a **PDF Utilities** app in your Start menu (Windows) or app launcher (Linux) that opens in its own window and **works without internet**.
 
-Open the live app in Chrome or Edge and click the **Install** icon in the address bar (Safari on macOS: *File → Add to Dock*). It should then open in its own window and work offline after the first visit.
+| | Option A: from the website | Option B: from your own computer |
+|---|---|---|
+| Needs | Chrome or Edge | Chrome or Edge, Git, Node.js 22+ |
+| Effort | 2 clicks | ~5 minutes, a few commands |
+| Available | ⚠️ Not yet: the [live site is offline](#live-site-not-online-yet) | ✅ Now |
 
-Until the site is online, run it locally (below).
+Use Chrome or Edge. Firefox has not been tested, and as far as we know it cannot install web apps as desktop apps.
 
-## Run it locally
+### Option A: install from the website (Windows and Linux)
 
-Requires Node.js 22+.
+> Works once the live site is online.
+
+1. Open https://ngarciar24.github.io/pdf-utilities/ in **Chrome** or **Edge**.
+2. Install it:
+   - **Chrome:** click the install icon (a screen with a down arrow) at the right end of the address bar. If you don't see it, use the **⋮** menu → *Cast, save and share* → *Install page as app…*
+   - **Edge:** click the install icon in the address bar, or use the **…** menu → *Apps* → *Install this site as an app*.
+3. Confirm with **Install**.
+
+Browser menus change between versions, so the labels may differ slightly.
+
+### Option B: install from your own computer
+
+This builds the app from the source code, serves it on `http://localhost:4173`, and then installs it from there. **After installing, you can stop the local server**: the app keeps working because the browser stores a copy (checked in Chromium).
+
+#### Windows
+
+> These Windows steps have not been tested yet. Please report anything that doesn't match.
+
+1. Open **PowerShell** (Start menu → type "PowerShell").
+2. Install Git and Node.js (skip any you already have):
+   ```powershell
+   winget install --id Git.Git -e
+   winget install --id OpenJS.NodeJS.LTS -e
+   ```
+   Close and reopen PowerShell, then check: `node -v` should print `v22` or higher.
+3. Download and start the app:
+   ```powershell
+   git clone https://github.com/Ngarciar24/pdf-utilities.git
+   cd pdf-utilities
+   npm ci
+   npm start
+   ```
+   Your browser opens at http://localhost:4173. If it doesn't, open that address yourself in Chrome or Edge.
+4. Install it as an app, following step 2 of [Option A](#option-a-install-from-the-website-windows-and-linux).
+5. Go back to PowerShell and press **Ctrl+C** to stop the server. Start the app from the Start menu from now on.
+
+#### Linux
+
+> Tested on Linux: a fresh clone, `npm ci` and `npm start` serve the app. The final install click needs a desktop session and has not been tested.
+
+1. Install Git and Node.js 22+ (skip any you already have):
+   - **Ubuntu / Debian:** the `nodejs` package from `apt` is often too old. Install Node through [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) instead, then run `nvm install 22`. Git: `sudo apt install git`.
+   - **Fedora:** `sudo dnf install git nodejs`
+   - **Arch:** `sudo pacman -S git nodejs npm`
+
+   Check with `node -v`: it should print `v22` or higher.
+2. Download and start the app:
+   ```sh
+   git clone https://github.com/Ngarciar24/pdf-utilities.git
+   cd pdf-utilities
+   npm ci
+   npm start
+   ```
+   Your browser opens at http://localhost:4173. If it doesn't, open that address yourself in Chrome or Edge.
+3. Install it as an app, following step 2 of [Option A](#option-a-install-from-the-website-windows-and-linux). Chrome and Edge add it to your app launcher.
+4. Press **Ctrl+C** in the terminal to stop the server. Start the app from your launcher from now on.
+
+#### Updating (Option B)
+
+The installed app does not update itself, because it only checks for updates when the local server is running. To update:
 
 ```sh
-npm install
-npm run dev        # development server at http://localhost:5173
-npm run build      # production build in dist/
-npm run preview    # serve the production build
+cd pdf-utilities
+git pull
+npm ci
+npm start
 ```
+
+Open the installed app once while the server is running. It downloads the new version and switches to it, either by reloading itself or the next time you open it. Then stop the server with **Ctrl+C**. (This update path has not been tested yet.)
+
+With Option A, updates arrive automatically the next time you open the app while online.
+
+### Uninstall
+
+- **The app:** open it, click the **⋮** (Chrome) or **…** (Edge) menu in its title bar → *Uninstall PDF Utilities*. Or go to `chrome://apps` or `edge://apps` and remove it there.
+- **The source code (Option B):** delete the `pdf-utilities` folder.
+
+Note: clearing your browser's site data for the app also removes its stored copy. It then needs the server (Option B) or the internet (Option A) once more.
 
 ## Deploy
 
@@ -109,7 +183,14 @@ The app is served from `/` by default. To serve it from a sub-path, build with `
 
 ## Development
 
+Requires Node.js 22+.
+
 ```sh
+npm ci             # install dependencies
+npm run dev        # development server with live reload at http://localhost:5173
+npm start          # production build, served at http://localhost:4173
+npm run build      # production build in dist/
+npm run preview    # serve an existing build
 npm run lint       # ESLint
 npm run typecheck  # TypeScript
 npm test           # unit tests (Vitest)
