@@ -167,10 +167,10 @@ Note: set Vite `base: '/pdf-utilities/'` for GitHub Pages (project sites live un
 
 ### Progress
 
-- [x] 1. Scaffold (Vite 8, React 19, TypeScript, Tailwind 4, ESLint, Vitest, Playwright, CI, Pages deploy)
+- [ ] 1. Scaffold: done and CI green, **except** the GitHub Pages deploy, which fails until Pages is enabled in the repo settings (see README → Status)
 - [x] 2. Images → PDF
-- [x] 3. Merge, Split, Rotate
-- [x] 4. PWA (installable, offline) and Docker image (built ahead of schedule)
+- [x] 3. Merge, Split, Rotate (known limitations listed in README → Status)
+- [ ] 4. PWA and Docker: code written, but install/offline and the Docker image are untested
 - [ ] 5. Page editor, PDF → Images, Metadata
 - [ ] 6. Extras
 
