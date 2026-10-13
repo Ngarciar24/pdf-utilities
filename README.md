@@ -6,14 +6,16 @@ Quick, private PDF tools that run entirely in your browser. Nothing is uploaded:
 
 | Tool | What it does |
 |---|---|
-| **Images → PDF** | PNG, JPG, WebP, GIF… to a PDF, one image per page. Page size (fit / A4 / Letter), orientation, margins, drag to reorder. |
+| **Images → PDF** | PNG, JPG, WebP, GIF… to a PDF, one image per page. Page size (fit / A4 / Letter), orientation, margins, drag to reorder. Images can also be pasted with Ctrl+V. |
+| **PDF → Images** | Save all or selected pages as PNG or JPG at 72, 150 or 300 dpi. One page downloads as an image, several as a zip. |
 | **Merge** | Combine several PDFs into one, in the order you choose. |
 | **Split** | Extract pages (`1-3, 7, 10-`) into a new PDF, or split every page into its own file (zip). |
 | **Rotate** | Rotate all or selected pages by 90°, 180° or 270°. |
+| **Paste image** | Paste a screenshot or copied image (Ctrl+V, or the paste button) and download it as PNG, JPG or its original format. Several pastes download as a zip or one PDF. |
 
 ## Status
 
-Last checked: 2026-10-10, commit `c787c6e` on `main`.
+Last checked: 2026-10-13.
 
 ### Live site: not online yet
 
@@ -30,13 +32,20 @@ https://ngarciar24.github.io/pdf-utilities/ returns **404**. The app builds and 
 
 ### What works
 
-Checked by automated tests: 25 unit tests, plus 6 browser tests that drive the real app in Chromium and open the downloaded files. All pass locally and in CI on `main`.
+Checked by automated tests: 25 unit tests, plus 15 browser tests that drive the real app in Chromium and open the downloaded files.
 
 | Feature | Status |
 |---|---|
 | Images → PDF: PNG and JPG, one image per page | ✅ Works |
 | Images → PDF: page size (fit / A4 / Letter), orientation, margins | ✅ Works |
 | Images → PDF: WebP, GIF, BMP and other formats | ✅ Works if your browser can display the format (converted to PNG first) |
+| Images → PDF: paste images with Ctrl+V | ✅ Works |
+| PDF → Images: all or selected pages, PNG or JPG, 72 / 150 / 300 dpi | ✅ Works; tests check the image size and that the page's text is drawn |
+| PDF → Images: PDFs with only an *owner* password (copy/print restrictions) | ✅ Works (Merge, Split and Rotate still refuse these) |
+| PDF → Images: scanned PDFs with JPEG 2000 images | ✅ Works (checked by hand with a test PDF) |
+| Paste image: Ctrl+V, download as PNG / JPG / original format | ✅ Works |
+| Paste image: "click here to paste" button | ✅ Works in Chromium after allowing clipboard access |
+| Paste image: several pastes as a zip, or as one PDF | ✅ Works |
 | Reorder files by drag-and-drop or the ‹ › buttons, remove files | ✅ Works |
 | Merge any number of PDFs in a chosen order | ✅ Works (see limitations) |
 | Split: extract pages like `1-3, 7, 10-` into one PDF | ✅ Works (see limitations) |
@@ -50,26 +59,31 @@ Checked by automated tests: 25 unit tests, plus 6 browser tests that drive the r
 
 | Case | What happens |
 |---|---|
-| **Password-protected PDFs** | Refused with "is password-protected and can't be opened". This includes PDFs with only an *owner* password (copy/print restrictions) that open fine in a normal PDF viewer. |
+| **Password-protected PDFs** | PDFs that need a password to open are refused by every tool. PDFs with only an *owner* password (copy/print restrictions) work in PDF → Images, but Merge, Split and Rotate refuse them with "is password-protected and can't be opened". |
 | **Fillable forms** after Merge or Split | Form fields are lost from the output; they are no longer fillable. Rotate keeps them. |
 | **Bookmarks** (the outline sidebar) after Merge or Split | Not kept. |
 | **Document info** (title, author, subject) after Merge or Split | Not kept. Rotate keeps it. |
 | **HEIC/HEIF photos** (iPhone default) | Only work in browsers that can display HEIC (Safari). In Chrome, Edge and Firefox you get "is not an image your browser can read". Export as JPG first. |
-| **Page previews** | Merge, Split and Rotate show the file name and page count only, not page thumbnails. You need to know the page numbers yourself. |
+| **Page previews** | Merge, Split, Rotate and PDF → Images show the file name and page count only, not page thumbnails. You need to know the page numbers yourself. |
 | **Very large files** | Everything runs in browser memory. Files of a few hundred MB may be slow or make the tab run out of memory. There is no size warning yet. |
+| **PDF → Images on long documents** | All images are kept in memory until the zip is made. Hundreds of pages at 300 dpi may make the tab run out of memory; convert in batches of selected pages instead. |
+| **PDF → Images on huge pages** | Images are capped at 16,384 px per side and 100 megapixels (a browser limit). Larger pages are scaled down to fit, so the result has a lower resolution than chosen. |
+| **PDF → Images offline** | Works offline for ordinary PDFs. PDFs that need extra fonts, Asian character maps or scan decoders (JBIG2 / JPEG 2000) only work offline after a PDF needing them has been opened once online. |
+| **Paste image: pasting copied *files*** | Copying an image file in File Explorer / Files and pressing Ctrl+V depends on the browser and may add nothing. Drop the file onto the page instead. |
+| **Paste image: the paste button outside Chromium** | Firefox and Safari may not allow it. Ctrl+V (⌘V on Mac) still works. |
 
 ### Not tested yet
 
 These are built but nobody has checked them yet. Treat them as unknown, not as working:
 
-- **Firefox and Safari.** The automated tests only run in Chromium (Chrome/Edge).
+- **Firefox and Safari.** The automated tests only run in Chromium (Chrome/Edge). This includes pasting and PDF → Images.
 - **The browser's "Install app" step** on a real Windows or Linux desktop, and all of the Windows installation steps. Tested so far, in Chromium: after one visit, the app loads and processes PDFs with no network and with the local server stopped.
 - **Docker image.** The `Dockerfile` has never been built, and no image has been published to `ghcr.io` (that only happens when a `v*` tag is pushed).
 - **Netlify / Vercel / Cloudflare Pages.** Should work as described below, but have not been tried.
 
 ### Not built yet
 
-PDF → images, page editor (reorder/delete pages with thumbnails), metadata editing, page numbers and watermarks, compression, password protect/unlock, OCR. See [PLAN.md](PLAN.md).
+Page editor (reorder/delete pages with thumbnails), metadata editing, page numbers and watermarks, compression, password protect/unlock, OCR. See [PLAN.md](PLAN.md).
 
 ## Installation
 

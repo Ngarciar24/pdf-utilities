@@ -5,6 +5,8 @@ const ImagesToPdfTool = lazy(() => import('./tools/ImagesToPdfTool').then((m) =>
 const MergeTool = lazy(() => import('./tools/MergeTool').then((m) => ({ default: m.MergeTool })))
 const SplitTool = lazy(() => import('./tools/SplitTool').then((m) => ({ default: m.SplitTool })))
 const RotateTool = lazy(() => import('./tools/RotateTool').then((m) => ({ default: m.RotateTool })))
+const PdfToImagesTool = lazy(() => import('./tools/PdfToImagesTool').then((m) => ({ default: m.PdfToImagesTool })))
+const PasteImageTool = lazy(() => import('./tools/PasteImageTool').then((m) => ({ default: m.PasteImageTool })))
 
 interface Tool {
   id: string
@@ -14,9 +16,11 @@ interface Tool {
 
 const TOOLS: Tool[] = [
   { id: 'images-to-pdf', name: 'Images → PDF', component: ImagesToPdfTool },
+  { id: 'pdf-to-images', name: 'PDF → Images', component: PdfToImagesTool },
   { id: 'merge', name: 'Merge', component: MergeTool },
   { id: 'split', name: 'Split', component: SplitTool },
   { id: 'rotate', name: 'Rotate', component: RotateTool },
+  { id: 'paste-image', name: 'Paste image', component: PasteImageTool },
 ]
 
 const REPO_URL = 'https://github.com/ngarciar24/pdf-utilities'
@@ -58,7 +62,7 @@ export function App() {
 
       <div className="mx-auto flex w-full max-w-6xl flex-1 flex-col md:flex-row">
         <nav aria-label="Tools" className="border-b border-slate-200 p-3 md:w-52 md:border-r md:border-b-0 dark:border-slate-800">
-          <ul className="flex gap-1 overflow-x-auto md:flex-col">
+          <ul className="flex flex-wrap gap-1 md:flex-col">
             {TOOLS.map((t) => (
               <li key={t.id}>
                 <a

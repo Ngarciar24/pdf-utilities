@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { Dropzone } from '../components/Dropzone'
 import { SortableFileList, type ListItem } from '../components/SortableFileList'
+import { usePastedFiles, useRevokeUnusedUrls } from '../components/hooks'
 import {
   Actions,
   Field,
@@ -32,14 +33,8 @@ export function ImagesToPdfTool() {
   const [busy, setBusy] = useState(false)
   const [status, setStatus] = useState<Status>(null)
 
-  // Release preview URLs when items are removed or the tool unmounts.
-  const urls = useRef(new Set<string>())
-  useEffect(() => {
-    const current = new Set(items.map((i) => i.previewUrl))
-    for (const url of urls.current) if (!current.has(url)) URL.revokeObjectURL(url)
-    urls.current = current
-  }, [items])
-  useEffect(() => () => urls.current.forEach((url) => URL.revokeObjectURL(url)), [])
+  useRevokeUnusedUrls(items.map((i) => i.previewUrl))
+  usePastedFiles(addFiles)
 
   function addFiles(files: File[]) {
     setStatus(null)
@@ -78,7 +73,7 @@ export function ImagesToPdfTool() {
   return (
     <div className="flex flex-col gap-6">
       <ToolHeader title="Images → PDF" description="Turn PNG, JPG and other images into a PDF, one image per page." />
-      <Dropzone accept="image/*" label="Drop images here" hint="PNG, JPG, WebP, GIF…" onFiles={addFiles} />
+      <Dropzone accept="image/*" label="Drop images here, or paste with Ctrl+V" hint="PNG, JPG, WebP, GIF…" onFiles={addFiles} />
       <SortableFileList items={items} onChange={setItems} />
 
       {items.length > 0 && (

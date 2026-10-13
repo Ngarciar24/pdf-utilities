@@ -171,7 +171,7 @@ Note: set Vite `base: '/pdf-utilities/'` for GitHub Pages (project sites live un
 - [x] 2. Images → PDF
 - [x] 3. Merge, Split, Rotate (known limitations listed in README → Status)
 - [ ] 4. PWA and Docker: code written, but install/offline and the Docker image are untested
-- [ ] 5. Page editor, PDF → Images, Metadata
+- [ ] 5. v0.2: PDF → Images ✅ and Paste image ✅ (added on request) are done; page editor and metadata are not
 - [ ] 6. Extras
 
 ## 10. Open questions

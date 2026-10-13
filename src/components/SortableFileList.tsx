@@ -28,9 +28,11 @@ interface SortableFileListProps<T extends ListItem> {
   items: T[]
   onChange: (items: T[]) => void
   icon?: ReactNode
+  /** Extra buttons shown on each item, before the move/remove buttons. */
+  actions?: (item: T) => ReactNode
 }
 
-export function SortableFileList<T extends ListItem>({ items, onChange, icon }: SortableFileListProps<T>) {
+export function SortableFileList<T extends ListItem>({ items, onChange, icon, actions }: SortableFileListProps<T>) {
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -62,6 +64,7 @@ export function SortableFileList<T extends ListItem>({ items, onChange, icon }: 
               index={index}
               total={items.length}
               icon={icon}
+              actions={actions?.(item)}
               onMove={(delta) => move(index, delta)}
               onRemove={() => onChange(items.filter((i) => i.id !== item.id))}
             />
@@ -77,11 +80,12 @@ interface SortableItemProps {
   index: number
   total: number
   icon?: ReactNode
+  actions?: ReactNode
   onMove: (delta: number) => void
   onRemove: () => void
 }
 
-function SortableItem({ item, index, total, icon, onMove, onRemove }: SortableItemProps) {
+function SortableItem({ item, index, total, icon, actions, onMove, onRemove }: SortableItemProps) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
 
   return (
@@ -107,13 +111,14 @@ function SortableItem({ item, index, total, icon, onMove, onRemove }: SortableIt
           {index + 1}
         </span>
       </div>
-      <div className="flex items-center gap-1 p-2">
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-medium" title={item.name}>
-            {item.name}
-          </p>
-          {item.detail && <p className="text-xs text-slate-500 dark:text-slate-400">{item.detail}</p>}
-        </div>
+      <div className="px-2 pt-2">
+        <p className="truncate text-sm font-medium" title={item.name}>
+          {item.name}
+        </p>
+      </div>
+      <div className="flex items-center gap-1 px-2 pb-1.5">
+        <p className="min-w-0 flex-1 truncate text-xs text-slate-500 dark:text-slate-400">{item.detail}</p>
+        {actions}
         <IconButton label={`Move ${item.name} earlier`} disabled={index === 0} onClick={() => onMove(-1)}>
           <path d="m15 18-6-6 6-6" />
         </IconButton>
@@ -128,7 +133,7 @@ function SortableItem({ item, index, total, icon, onMove, onRemove }: SortableIt
   )
 }
 
-function IconButton({
+export function IconButton({
   label,
   disabled,
   onClick,
