@@ -6,6 +6,7 @@ const MergeTool = lazy(() => import('./tools/MergeTool').then((m) => ({ default:
 const SplitTool = lazy(() => import('./tools/SplitTool').then((m) => ({ default: m.SplitTool })))
 const RotateTool = lazy(() => import('./tools/RotateTool').then((m) => ({ default: m.RotateTool })))
 const PdfToImagesTool = lazy(() => import('./tools/PdfToImagesTool').then((m) => ({ default: m.PdfToImagesTool })))
+const GifTool = lazy(() => import('./tools/GifTool').then((m) => ({ default: m.GifTool })))
 const PasteImageTool = lazy(() => import('./tools/PasteImageTool').then((m) => ({ default: m.PasteImageTool })))
 
 interface Tool {
@@ -21,6 +22,7 @@ const TOOLS: Tool[] = [
   { id: 'split', name: 'Split', component: SplitTool },
   { id: 'rotate', name: 'Rotate', component: RotateTool },
   { id: 'paste-image', name: 'Paste image', component: PasteImageTool },
+  { id: 'gif', name: 'Make a GIF', component: GifTool },
 ]
 
 const REPO_URL = 'https://github.com/ngarciar24/pdf-utilities'

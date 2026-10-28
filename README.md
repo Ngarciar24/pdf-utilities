@@ -12,10 +12,11 @@ Quick, private PDF tools that run entirely in your browser. Nothing is uploaded:
 | **Split** | Extract pages (`1-3, 7, 10-`) into a new PDF, or split every page into its own file (zip). |
 | **Rotate** | Rotate all or selected pages by 90°, 180° or 270°. |
 | **Paste image** | Paste a screenshot or copied image (Ctrl+V, or the paste button) and download it as PNG, JPG or its original format. Several pastes download as a zip or one PDF. |
+| **Make a GIF** | Turn images and PDF pages into an animated GIF, with a live preview. Set the time per image (0.05–5 s), loop forever or play once, forwards or back and forth, a pause before repeating, cut or fade transitions, width (320–800 px), how differently shaped images fit, and quality. |
 
 ## Status
 
-Last checked: 2026-10-13.
+Last checked: 2026-10-28.
 
 ### Live site: not online yet
 
@@ -32,7 +33,7 @@ https://ngarciar24.github.io/pdf-utilities/ returns **404**. The app builds and 
 
 ### What works
 
-Checked by automated tests: 25 unit tests, plus 15 browser tests that drive the real app in Chromium and open the downloaded files.
+Checked by automated tests: 39 unit tests, plus 20 browser tests that drive the real app in Chromium and open the downloaded files.
 
 | Feature | Status |
 |---|---|
@@ -46,6 +47,11 @@ Checked by automated tests: 25 unit tests, plus 15 browser tests that drive the 
 | Paste image: Ctrl+V, download as PNG / JPG / original format | ✅ Works |
 | Paste image: "click here to paste" button | ✅ Works in Chromium after allowing clipboard access |
 | Paste image: several pastes as a zip, or as one PDF | ✅ Works |
+| Make a GIF: images (drop, browse or paste) and PDFs (one frame per page) | ✅ Works |
+| Make a GIF: speed, loop forever / play once, back and forth, pause before repeating, width | ✅ Works; tests decode the GIF and check frame count, delays, size and looping |
+| Make a GIF: quick and slow fade transitions | ✅ Works; tests check the blended frames |
+| Make a GIF: reorder and remove frames, live preview while you change settings | ✅ Works; the page stays responsive while the GIF is built |
+| Make a GIF: offline | ✅ Works once the app has been opened online (PDF inputs: see the PDF → Images offline note) |
 | Reorder files by drag-and-drop or the ‹ › buttons, remove files | ✅ Works |
 | Merge any number of PDFs in a chosen order | ✅ Works (see limitations) |
 | Split: extract pages like `1-3, 7, 10-` into one PDF | ✅ Works (see limitations) |
@@ -71,12 +77,18 @@ Checked by automated tests: 25 unit tests, plus 15 browser tests that drive the 
 | **PDF → Images offline** | Works offline for ordinary PDFs. PDFs that need extra fonts, Asian character maps or scan decoders (JBIG2 / JPEG 2000) only work offline after a PDF needing them has been opened once online. |
 | **Paste image: pasting copied *files*** | Copying an image file in File Explorer / Files and pressing Ctrl+V depends on the browser and may add nothing. Drop the file onto the page instead. |
 | **Paste image: the paste button outside Chromium** | Firefox and Safari may not allow it. Ctrl+V (⌘V on Mac) still works. |
+| **GIF colours** | GIF allows at most 256 colours per frame. Photos and smooth gradients show some banding; this is a limit of the format. |
+| **GIF build time and size** | Measured in Chromium: 20 photos at 480 px take about 3 s (380 KB). 20 photos at 800 px with a slow fade make 180 frames and take about 18 s (8.8 MB). Fades multiply the frame count. Limits: 300 images and 1,500 frames. |
+| **GIF timing** | All images get the same time on screen (plus the optional pause on the last one); you can't set a different time for each image. The fastest speed is 0.05 s per image, because browsers slow down faster GIFs. |
+| **Transparent images in GIFs** | Transparency is not kept: transparent areas get the background colour (white by default). |
+| **Animated GIFs as input** | Only their first frame is used. |
+| **Differently shaped images in a GIF** | The GIF takes the shape of the first image. Others are fitted inside with a background colour, or cropped if you choose *Fill and crop*. |
 
 ### Not tested yet
 
 These are built but nobody has checked them yet. Treat them as unknown, not as working:
 
-- **Firefox and Safari.** The automated tests only run in Chromium (Chrome/Edge). This includes pasting and PDF → Images.
+- **Firefox and Safari.** The automated tests only run in Chromium (Chrome/Edge). This includes pasting, PDF → Images and Make a GIF (which needs Safari 16.4 or newer).
 - **The browser's "Install app" step** on a real Windows or Linux desktop, and all of the Windows installation steps. Tested so far, in Chromium: after one visit, the app loads and processes PDFs with no network and with the local server stopped.
 - **Docker image.** The `Dockerfile` has never been built, and no image has been published to `ghcr.io` (that only happens when a `v*` tag is pushed).
 - **Netlify / Vercel / Cloudflare Pages.** Should work as described below, but have not been tried.
